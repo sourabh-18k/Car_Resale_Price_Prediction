@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'git@github.com:sourabh-18k/Car_Resale_Price_Prediction.git'
+                git 'https://github.com/sourabh-18k/Car_Resale_Price_Prediction.git'
             }
         }
 
