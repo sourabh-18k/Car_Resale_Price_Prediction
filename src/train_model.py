@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 
 # Load preprocessed data
-df = pd.read_csv("data/cleaned_preprocessed.csv")
+df = pd.read_csv("../data/cleaned_preprocessed.csv")
 
 # Features and target
 X = df.drop("resale_price", axis=1)
@@ -17,7 +17,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # -------------------- RANDOM FOREST --------------------
 rf_model = RandomForestRegressor(n_estimators=80, random_state=42)
 rf_model.fit(X_train, y_train)
-joblib.dump(rf_model, 'models/rf_model.pkl')
+joblib.dump(rf_model, '../models/rf_model.pkl')
 
 # ----------------- GRADIENT BOOSTING -------------------
 gb_model = GradientBoostingRegressor(random_state=42)
@@ -39,4 +39,4 @@ print(f"\n Best Gradient Boosting Params: {best_params}")
 # Train with best params
 gb_model = GradientBoostingRegressor(**best_params, random_state=42)
 gb_model.fit(X_train, y_train)
-joblib.dump(gb_model, 'models/gb_model.pkl')
+joblib.dump(gb_model, '../models/gb_model.pkl')

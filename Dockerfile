@@ -1,17 +1,18 @@
-# Use the latest Python 3.10 image
-FROM python:latest
+# Base image
+FROM python:3.10-slim
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the local project files into the container
-COPY . /app
+# Copy app code
+COPY app/ .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose a port (optional, depending on whether you want to serve the model via an API)
-EXPOSE 5000
+# Expose port used by Streamlit
+EXPOSE 8501
 
-# Command to run the training script
-CMD ["python", "src/train_model.py"]
+# Run Streamlit
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+

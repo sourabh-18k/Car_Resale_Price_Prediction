@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
+import joblib
+from sklearn.preprocessing import LabelEncoder
 #import seaborn as sns
 #import matplotlib.pyplot as plt
 
-data = pd.read_csv("data/car_resale_prices.csv")
+data = pd.read_csv("../data/car_resale_prices.csv")
 
 df = data.copy()
 
@@ -90,8 +92,18 @@ df["body_type"] = df.groupby("full_name")["body_type"].transform(lambda x: x.fil
 df["body_type"] = df["body_type"].fillna(df["body_type"].mode()[0])
 
 
-df = pd.get_dummies(df, columns=["transmission_type", "fuel_type", "body_type"], drop_first=True)
+# Columns to encode
+cols_to_encode = ["transmission_type", "fuel_type", "body_type"]
 
+# Create a LabelEncoder object
+le = LabelEncoder()
+
+# Apply label encoding to each column
+for col in cols_to_encode:
+    df[col + '_encoded'] = le.fit_transform(df[col])
+
+
+df.drop(columns=["transmission_type", "fuel_type", "body_type"], inplace=True)
 
 
 # Split "full_name" into components without limiting splits
@@ -127,7 +139,7 @@ scaler = StandardScaler()
 numerical_cols = ["registered_year", "engine_capacity", "kms_driven", "max_power", "seats", "mileage"]
 df[numerical_cols] = scaler.fit_transform(df[numerical_cols])
 
-df.to_csv("data/cleaned_preprocessed.csv", index=False)
-
+df.to_csv("../data/cleaned_preprocessed.csv", index=False)
+joblib.dump(scaler, '../models/scaler.pkl')
 
 
