@@ -5,7 +5,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def image = docker.build("car-price-app")
+                    sh 'docker build -t car-price-app .'
                 }
             }
         }
@@ -13,7 +13,11 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
-                    sh "docker run -d -p 8501:8501 car-price-app"
+                    // Remove existing container if already running
+                    sh '''
+                        docker rm -f car-price-container || true
+                        docker run -d -p 8501:8501 --name car-price-container car-price-app
+                    '''
                 }
             }
         }
