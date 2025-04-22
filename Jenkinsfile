@@ -2,68 +2,49 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "car-price-app"
-        TAG = "latest"
-        DOCKER_USER = "sourabh0718"
-        DOCKER_REPO = "sourabh0718/car-price-app"
+        IMAGE_NAME = 'my-static-website'
+        CONTAINER_NAME = 'static-site-container'
+        HOST_PORT = '8080'
+        CONTAINER_PORT = '80'
     }
 
     stages {
-        stage("Install Docker CLI") {
+        stage('Clone Repository') {
             steps {
-                echo "🛠️ Installing Docker CLI"
-                sh 'apt-get update'
-                sh 'apt-get install -y --no-install-recommends docker-ce-cli'
+                echo "🔄 Cloning website code..."
+                git 'git@github.com:sourabh-18k/website.git'
             }
         }
 
-        stage("Clone Code") {
+        stage('Build Docker Image') {
             steps {
-                echo "🔄 Cloning the code"
-                git url: "https://github.com/sourabh-18k/Car_Resale_Price_Prediction.git", branch: "main"
+                echo "🐳 Building Docker image..."
+                sh "docker build -t ${IMAGE_NAME} ."
             }
         }
 
-        stage("Build") {
+        stage('Run Docker Container') {
             steps {
-                echo "🐳 Building the Docker image"
-                sh "docker build -t ${IMAGE_NAME}:${TAG} ."
-            }
-        }
+                script {
+                    echo "🏃 Running Docker container..."
+                    // Stop and remove previous container if it exists
+                    sh "docker stop ${CONTAINER_NAME} || true"
+                    sh "docker rm ${CONTAINER_NAME} || true"
 
-        stage("Push to Docker Hub") {
-            steps {
-                echo "📤 Pushing to Docker Hub"
-                withCredentials([usernamePassword(credentialsId: "docker-hub-credentials", passwordVariable: "docker-hub-pass", usernameVariable: "docker-hub-id")]) {
-                    sh """
-                        echo Logging into Docker Hub
-                        docker login -u ${docker-hub-id} -p ${docker-hub-pass}
-                        docker tag ${IMAGE_NAME}:${TAG} ${DOCKER_REPO}:${TAG}
-                        docker push ${DOCKER_REPO}:${TAG}
-                    """
+                    // Run the new container
+                    sh "docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}"
+                    echo "✅ Static website running at http://localhost:${HOST_PORT}"
                 }
-            }
-        }
-
-        stage("Deploy") {
-            steps {
-                echo "🚀 Deploying the container"
-                sh """
-                    echo Stopping existing containers
-                    docker-compose down
-                    echo Deploying the new container
-                    docker-compose up -d
-                """
             }
         }
     }
 
     post {
-        always {
-            echo "🎬 Pipeline completed."
+        success {
+            echo "🎉 Pipeline finished successfully! Static website is live at http://localhost:${env.HOST_PORT}"
         }
         failure {
-            echo "❌ Pipeline failed."
+            echo "💔 Pipeline failed! Check the console output for errors."
         }
     }
 }
