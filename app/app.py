@@ -4,9 +4,10 @@ import numpy as np
 import joblib
 
 # Load models and scaler
-rf_model = joblib.load('../models/rf_model.pkl')
-gb_model = joblib.load('../models/gb_model.pkl')
-scaler = joblib.load('../models/scaler.pkl')
+rf_model = joblib.load('models/rf_model.pkl')
+gb_model = joblib.load('models/gb_model.pkl')
+scaler = joblib.load('models/scaler.pkl')
+
 
 st.title("🚗 Car Resale Price Predictor")
 
