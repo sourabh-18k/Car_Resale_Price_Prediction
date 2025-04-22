@@ -1,13 +1,7 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/sourabh-18k/Car_Resale_Price_Prediction.git'
-            }
-        }
-
+    
         stage('Build Docker Image') {
             steps {
                 script {
