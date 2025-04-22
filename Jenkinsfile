@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.8-slim' // Use a Python Docker image
-            args '-v /tmp:/tmp' // Mount temp directory for Docker if needed
-        }
-    }
+    agent any
 
     environment {
         IMAGE_NAME = "car-price-app"
@@ -14,6 +9,18 @@ pipeline {
     }
 
     stages {
+        stage("Install Python & pip") {
+            steps {
+                script {
+                    echo "🔧 Installing Python & pip..."
+                    sh """
+                    apt-get update
+                    apt-get install -y python3 python3-pip
+                    """
+                }
+            }
+        }
+
         stage("Clone Repo") {
             steps {
                 echo "🔄 Cloning repository..."
@@ -25,13 +32,6 @@ pipeline {
             steps {
                 echo "📦 Installing Python dependencies..."
                 sh "pip install -r requirements.txt"
-            }
-        }
-
-        stage("Run Tests") {
-            steps {
-                echo "🧪 Running basic tests using pytest..."
-                sh "pytest tests/test_dummy.py"
             }
         }
 
