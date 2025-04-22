@@ -5,7 +5,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("car-price-app")
+                    def image = docker.build("car-price-app")
                 }
             }
         }
@@ -13,7 +13,7 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
-                    dockerImage.run("-d -p 8501:8501")
+                    sh "docker run -d -p 8501:8501 car-price-app"
                 }
             }
         }
