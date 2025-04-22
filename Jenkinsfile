@@ -9,6 +9,14 @@ pipeline {
     }
 
     stages {
+        stage("Install Docker CLI") {
+            steps {
+                echo "🛠️ Installing Docker CLI"
+                sh 'apt-get update'
+                sh 'apt-get install -y --no-install-recommends docker-ce-cli'
+            }
+        }
+
         stage("Clone Code") {
             steps {
                 echo "🔄 Cloning the code"
