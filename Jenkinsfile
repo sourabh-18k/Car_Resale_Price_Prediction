@@ -2,49 +2,67 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'my-static-website'
-        CONTAINER_NAME = 'static-site-container'
-        HOST_PORT = '8080'
-        CONTAINER_PORT = '80'
+        IMAGE_NAME = "car-price-app"
+        TAG = "latest"
+        DOCKER_USER = "sourabh0718"
+        DOCKER_REPO = "sourabh0718/car-price-app"
+        HOST_PORT = '8080' // Assuming you want to expose it on port 8080
+        CONTAINER_PORT = '5000' // Assuming your app inside the container runs on port 5000
     }
 
     stages {
-        stage('Clone Repository') {
+        stage("Clone Code") {
             steps {
-                echo "🔄 Cloning website code..."
-                git 'git@github.com:sourabh-18k/website.git'
+                echo "🔄 Cloning the code"
+                git url: "https://github.com/sourabh-18k/Car_Resale_Price_Prediction.git", branch: "main"
             }
         }
 
-        stage('Build Docker Image') {
+        stage("Build") {
             steps {
-                echo "🐳 Building Docker image..."
-                sh "docker build -t ${IMAGE_NAME} ."
+                echo "🐳 Building the Docker image"
+                sh "docker build -t ${IMAGE_NAME}:${TAG} ."
             }
         }
 
-        stage('Run Docker Container') {
+        stage("Run Container") {
             steps {
                 script {
-                    echo "🏃 Running Docker container..."
+                    echo "🚀 Running the Docker container"
                     // Stop and remove previous container if it exists
-                    sh "docker stop ${CONTAINER_NAME} || true"
-                    sh "docker rm ${CONTAINER_NAME} || true"
+                    sh "docker stop ${IMAGE_NAME}-${TAG} || true"
+                    sh "docker rm ${IMAGE_NAME}-${TAG} || true"
 
                     // Run the new container
-                    sh "docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}"
-                    echo "✅ Static website running at http://localhost:${HOST_PORT}"
+                    sh "docker run -d --name ${IMAGE_NAME}-${TAG} -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}:${TAG}"
+                    echo "✅ Application running at http://localhost:${HOST_PORT}"
                 }
             }
         }
+
+        stage("Push to Docker Hub") {
+            steps {
+                echo "📤 Pushing to Docker Hub"
+                withCredentials([usernamePassword(credentialsId: "docker-hub-credentials", passwordVariable: "docker-hub-pass", usernameVariable: "docker-hub-id")]) {
+                    sh """
+                        echo Logging into Docker Hub
+                        docker login -u ${docker-hub-id} -p ${docker-hub-pass}
+                        docker tag ${IMAGE_NAME}:${TAG} ${DOCKER_REPO}:${TAG}
+                        docker push ${DOCKER_REPO}:${TAG}
+                    """
+                }
+            }
+        }
+
+        // Removed the separate 'Deploy' stage as the 'Run Container' stage now handles running the application
     }
 
     post {
         success {
-            echo "🎉 Pipeline finished successfully! Static website is live at http://localhost:${env.HOST_PORT}"
+            echo "🎉 Pipeline finished successfully! Application is live at http://localhost:${env.HOST_PORT}"
         }
         failure {
-            echo "💔 Pipeline failed! Check the console output for errors."
+            echo "💔 Pipeline failed!"
         }
     }
 }
