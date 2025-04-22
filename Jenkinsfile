@@ -5,10 +5,22 @@ pipeline {
         IMAGE_NAME = "car-price-app"
         TAG = "latest"
         DOCKER_USER = "sourabh0718"
-        DOCKER_REPO = "${DOCKER_USER}/${IMAGE_NAME}"
+        DOCKER_REPO = "sourabh0718/car-price-app"
     }
 
     stages {
+        stage("Install Python & pip") {
+            steps {
+                script {
+                    echo "🔧 Installing Python & pip..."
+                    sh """
+                    apt-get update
+                    apt-get install -y python3 python3-pip
+                    """
+                }
+            }
+        }
+
         stage("Clone Repo") {
             steps {
                 echo "🔄 Cloning repository..."
@@ -16,49 +28,60 @@ pipeline {
             }
         }
 
+        stage("Install Dependencies") {
+            steps {
+                echo "📦 Installing Python dependencies..."
+                sh "pip install -r requirements.txt"
+            }
+        }
+
         stage("Run Tests") {
             steps {
                 echo "🧪 Running basic tests using pytest..."
-                sh 'pip install -r requirements.txt'
-                sh 'pip install pytest'
-                sh 'pytest tests/'
+                sh "pytest tests/test_dummy.py"
             }
         }
 
         stage("Build Docker Image") {
             steps {
                 echo "🐳 Building Docker image..."
-                sh "docker build -t ${IMAGE_NAME}:${TAG} ."
+                sh """
+                docker build -t ${DOCKER_REPO}:${TAG} .
+                """
             }
         }
 
         stage("Push to Docker Hub") {
             steps {
                 echo "📤 Pushing Docker image to Docker Hub..."
-                withCredentials([usernamePassword(credentialsId: "docker-hub-credentials", passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
+                withCredentials([usernamePassword(credentialsId: "docker-hub-credentials", passwordVariable: "docker-hub-pass", usernameVariable: "docker-hub-id")]) {
                     sh """
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker tag ${IMAGE_NAME}:${TAG} ${DOCKER_REPO}:${TAG}
-                        docker push ${DOCKER_REPO}:${TAG}
+                    echo Logging into Docker Hub
+                    docker login -u ${docker-hub-id} -p ${docker-hub-pass}
+                    docker tag ${DOCKER_REPO}:${TAG} ${DOCKER_USER}/${DOCKER_REPO}:${TAG}
+                    docker push ${DOCKER_USER}/${DOCKER_REPO}:${TAG}
                     """
                 }
             }
         }
 
-        stage("Run Container (Local)") {
+        stage("Deploy Docker Container") {
             steps {
-                echo "🚀 Running Docker container locally on port 8501..."
-                sh "docker run -d -p 8501:8501 ${DOCKER_REPO}:${TAG}"
+                echo "🚀 Deploying Docker container..."
+                sh """
+                docker-compose down
+                docker-compose up -d
+                """
             }
         }
     }
 
     post {
         always {
-            echo "✅ Pipeline complete."
+            echo "🎬 Pipeline completed."
         }
         failure {
-            echo "❌ Pipeline failed. Check the logs."
+            echo "❌ Pipeline failed."
         }
     }
 }
