@@ -43,10 +43,10 @@ pipeline {
         stage("Push to Docker Hub") {
             steps {
                 echo "📤 Pushing to Docker Hub"
-                withCredentials([usernamePassword(credentialsId: "docker-hub-credentials", passwordVariable: "docker-hub-pass", usernameVariable: "docker-hub-id")]) {
+                withCredentials([usernamePassword(credentialsId: "docker-hub-credentials", passwordVariable: "docker_hub_pass", usernameVariable: "docker_hub_id")]) {
                     sh """
                         echo Logging into Docker Hub
-                        docker login -u ${docker-hub-id} -p ${docker-hub-pass}
+                        docker login -u ${docker_hub_id} -p ${docker_hub_pass}
                         docker tag ${IMAGE_NAME}:${TAG} ${DOCKER_REPO}:${TAG}
                         docker push ${DOCKER_REPO}:${TAG}
                     """
