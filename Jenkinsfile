@@ -43,7 +43,7 @@ pipeline {
         stage("Push to Docker Hub") {
             steps {
                 echo "📤 Pushing to Docker Hub"
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
                         echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
                         docker tag ${IMAGE_NAME}:${TAG} \$DOCKER_USER/${IMAGE_NAME}:${TAG}
