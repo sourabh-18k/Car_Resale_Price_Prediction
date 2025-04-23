@@ -6,8 +6,8 @@ pipeline {
         TAG = "latest"
         DOCKER_USER = "sourabh0718"
         DOCKER_REPO = "sourabh0718/car-price-app"
-        HOST_PORT = '8080' // Assuming you want to expose it on port 8080
-        CONTAINER_PORT = '5000' // Assuming your app inside the container runs on port 5000
+        HOST_PORT = '8083' 
+        CONTAINER_PORT = '5000' 
     }
 
     stages {
@@ -54,7 +54,7 @@ pipeline {
             }
         }
 
-        // Removed the separate 'Deploy' stage as the 'Run Container' stage now handles running the application
+        
     }
 
     post {
