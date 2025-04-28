@@ -65,7 +65,7 @@ if submit:
     input_data[numerical_cols] = scaler.transform(input_data[numerical_cols])
 
     # Predict
-    model = rf_model if model_choice == "Random Forest" else gb_model
+    model = gb_model if model_choice == "Gradient Boosting" else rf_model
     log_price = model.predict(input_data)[0]
     predicted_price = np.expm1(log_price)  # Inverse of log1p
 
