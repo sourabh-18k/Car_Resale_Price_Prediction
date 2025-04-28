@@ -10,7 +10,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))  # Path of app.py
 parent_dir = os.path.dirname(current_dir)  # Go one level up, where models/ is
 
 # Load models and scaler using the correct path
-rf_model = joblib.load(os.path.join(parent_dir, 'models', 'rf_model.pkl'))
+#rf_model = joblib.load(os.path.join(parent_dir, 'models', 'rf_model.pkl'))
 gb_model = joblib.load(os.path.join(parent_dir, 'models', 'gb_model.pkl'))
 scaler = joblib.load(os.path.join(parent_dir, 'models', 'scaler.pkl'))
 
@@ -65,7 +65,7 @@ if submit:
     input_data[numerical_cols] = scaler.transform(input_data[numerical_cols])
 
     # Predict
-    model = gb_model if model_choice == "Gradient Boosting" else rf_model
+    model = gb_model #if model_choice == "Gradient Boosting" else rf_model
     log_price = model.predict(input_data)[0]
     predicted_price = np.expm1(log_price)  # Inverse of log1p
 
