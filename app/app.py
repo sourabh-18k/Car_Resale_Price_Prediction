@@ -2,12 +2,17 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import os
 
-# Load models and scaler
-rf_model = joblib.load('models/rf_model.pkl')
-gb_model = joblib.load('models/gb_model.pkl')
-scaler = joblib.load('models/scaler.pkl')
 
+# Correct path handling
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Path of app.py
+parent_dir = os.path.dirname(current_dir)  # Go one level up, where models/ is
+
+# Load models and scaler using the correct path
+rf_model = joblib.load(os.path.join(parent_dir, 'models', 'rf_model.pkl'))
+gb_model = joblib.load(os.path.join(parent_dir, 'models', 'gb_model.pkl'))
+scaler = joblib.load(os.path.join(parent_dir, 'models', 'scaler.pkl'))
 
 st.title("🚗 Car Resale Price Predictor")
 
