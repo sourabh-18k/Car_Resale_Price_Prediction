@@ -13,14 +13,14 @@ pipeline {
     stages {
         stage("Clone Code") {
             steps {
-                echo "🔄 Cloning the code"
+                echo " Cloning the code"
                 git url: "https://github.com/sourabh-18k/Car_Resale_Price_Prediction.git", branch: "main"
             }
         }
 
         stage("Build") {
             steps {
-                echo "🐳 Building the Docker image"
+                echo " Building the Docker image"
                 sh "docker build -t ${IMAGE_NAME}:${TAG} ."
             }
         }
@@ -28,21 +28,21 @@ pipeline {
         stage("Run Container") {
             steps {
                 script {
-                    echo "🚀 Running the Docker container"
+                    echo "Running the Docker container"
                     // Stop and remove previous container if it exists
                     sh "docker stop ${IMAGE_NAME}-${TAG} || true"
                     sh "docker rm ${IMAGE_NAME}-${TAG} || true"
 
                     // Run the new container
                     sh "docker run -d --name ${IMAGE_NAME}-${TAG} -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}:${TAG}"
-                    echo "✅ Application running at http://localhost:${HOST_PORT}"
+                    echo " Application running at http://localhost:${HOST_PORT}"
                 }
             }
         }
 
         stage("Push to Docker Hub") {
             steps {
-                echo "📤 Pushing to Docker Hub"
+                echo "Pushing to Docker Hub"
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
                         echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
@@ -59,10 +59,10 @@ pipeline {
 
     post {
         success {
-            echo "🎉 Pipeline finished successfully! Application is live at http://localhost:${env.HOST_PORT}"
+            echo " Pipeline finished successfully! Application is live at http://localhost:${env.HOST_PORT}"
         }
         failure {
-            echo "💔 Pipeline failed!"
+            echo "Pipeline failed!"
         }
     }
 }
