@@ -6,7 +6,7 @@ pipeline {
         TAG = "latest"
         DOCKER_USER = "sourabh0718"
         DOCKER_REPO = "sourabh0718/car-price-app"
-        HOST_PORT = '8502'   //85 
+        HOST_PORT = '8502'   //850 
         CONTAINER_PORT = '8502' 
     }
 
