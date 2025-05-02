@@ -14,7 +14,7 @@ rf_model = joblib.load(os.path.join(parent_dir, 'models', 'rf_model.pkl'))
 gb_model = joblib.load(os.path.join(parent_dir, 'models', 'gb_model.pkl'))
 scaler = joblib.load(os.path.join(parent_dir, 'models', 'scaler.pkl'))
 
-st.title("🚗 Car Resale Price Predictor")
+st.title("🚗Vehiclesale Price Predictor")
 
 st.markdown("Fill in the car details to get the predicted resale price.")
 
